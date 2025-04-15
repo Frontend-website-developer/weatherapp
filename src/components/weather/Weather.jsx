@@ -4,40 +4,53 @@ import sunrise from '../../assets/sunrise.png';
 
 function Weather({ city }) {
     const [weatherData, setWeatherData] = useState(null);
+    const [error, setError] = useState(null);
   
     useEffect(() => {
       const apiKey = "86d0696ba78ba5b5937688fe578931b4";
-      if(navigator.geolocation){
+    
+      const fetchWeatherData = (lat, lon) => {
+        const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&q=${city}&appid=${apiKey}&units=metric`;
+    
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            console.log("Weather Data:", data);
+            if (data.cod === "200") {
+              setWeatherData(data);
+            } else {
+              setError("City not found");
+            }
+          })
+          .catch(error => {
+            console.log("Error fetching data:", error);
+            setError("Error fetching data");
+          });
+      };
+    
+      if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-            const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&q=${city}&appid=${apiKey}&units=metric`;
-          
-          fetch(url)
-        .then(response => response.json())
-        .then(data => {
-          console.log("Weather Data:", data);
-          if (data.cod === "200") {
-            setWeatherData(data);
-          } else {
-            setError("City not found");
+            fetchWeatherData(lat, lon);
+          },
+          (error) => {
+            console.log("Geolocation error:", error);
+            setError("Unable to access location");
+            console.log("test");
+            const fallbackLat = "";
+        const fallbackLon = "";
+        fetchWeatherData(fallbackLat, fallbackLon);
+        <h1>Enter City Name...</h1>
+        return(
+        <h1>Enter City Name...</h1>
+      )
           }
-        })
-        .catch(error => {
-          console.log("Error fetching data:", error);
-        });
+        );
       }
-        )
-      }
-      
-  
-      
     }, [city]);
   
-    if (!weatherData || !weatherData.list || weatherData.list.length === 0) {
-        return <p>Loading forecast...</p>;
-      }
 
     return (
       <>
@@ -77,7 +90,7 @@ function Weather({ city }) {
                       </div>
   </>
                   ) : (
-                    <p>Loading weather data...</p>
+                    <p>Please Enter City Name...</p>
                   )}
                 </div>
       </>
