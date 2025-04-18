@@ -11,7 +11,7 @@ function App() {
   }
   return (
     <>
-      <div className='page-background'>
+      <div className='page-background flex items-center'>
         <div class="container mx-auto">
             <Header onSubmitCity={handleSubmitCity} />
             <Weather city={city} />
